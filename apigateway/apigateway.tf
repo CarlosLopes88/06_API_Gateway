@@ -975,7 +975,7 @@ resource "aws_api_gateway_stage" "concessionaria" {
 }
 
 variable "cognito_user_pool_arn" {
-  description = "ARN do Cognito User Pool (exemplo: arn:aws:cognito-idp:us-east-1:740588470221:userpool/us-east-1_asasasasa)"
+  description = "ARN do Cognito User Pool (exemplo: arn:aws:cognito-idp:us-east-1:740588470221:userpool/us-east-1_asasasasasa)"
   type        = string
 }
 
