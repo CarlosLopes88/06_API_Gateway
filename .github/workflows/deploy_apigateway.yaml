@@ -1,0 +1,79 @@
+name: Deploy API Gateway
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  TERRAFORM_VERSION: "1.10.1"
+
+jobs:
+  deploy-apigateway:
+    runs-on: ubuntu-latest
+    outputs:
+      api_gateway_url: ${{ steps.get-outputs.outputs.api-url }}
+      api_gateway_arn: ${{ steps.get-outputs.outputs.api-arn }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        working-directory: ./apigateway
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: ./apigateway
+        run: |
+          terraform plan -out=tfplan \
+            -var="lb_venda_url=${{ secrets.URL_LB_PED }}" \
+            -var="lb_produto_url=${{ secrets.URL_LB_PRO }}" \
+            -var="lb_cliente_url=${{ secrets.URL_LB_CLI }}" \
+            -var="cognito_user_pool_arn=${{ secrets.COGNITO }}"
+          
+      - name: Terraform Apply
+        working-directory: ./apigateway
+        run: |
+          terraform apply -auto-approve tfplan
+          
+          echo "Waiting for API Gateway to be ready..."
+          attempt=1
+          max_attempts=10
+          until aws apigateway get-stage \
+            --rest-api-id $(terraform output -raw api_gateway_arn | cut -d: -f6) \
+            --stage-name v1 > /dev/null 2>&1 || [ $attempt -eq $max_attempts ]; do
+            echo "Attempt $attempt of $max_attempts..."
+            sleep 30
+            attempt=$((attempt + 1))
+          done
+
+      - name: Get API Gateway Outputs
+        id: get-outputs
+        working-directory: ./apigateway
+        run: |
+          {
+            echo "api-url<<EOF"
+            terraform output -raw api_gateway_url
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+          {
+            echo "api-arn<<EOF"
+            terraform output -raw api_gateway_arn
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
