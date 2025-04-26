@@ -315,11 +315,6 @@ resource "aws_api_gateway_method" "venda_get_ativos" {
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
-
-  request_parameters = {
-    "method.request.path.status" = true
-  }
-
 }
 
 resource "aws_api_gateway_integration" "venda_get_ativos" {
@@ -333,11 +328,6 @@ resource "aws_api_gateway_integration" "venda_get_ativos" {
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
-
-  request_parameters = {
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
-  }
-  
 }
 
 # GET /venda/status/{status}
