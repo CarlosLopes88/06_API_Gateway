@@ -1258,19 +1258,6 @@ resource "aws_api_gateway_deployment" "concessionaria" {
   }
 }
 
-# Configurações de log para API Gateway
-resource "aws_api_gateway_method_settings" "all" {
-  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  stage_name  = aws_api_gateway_stage.concessionaria.stage_name
-  method_path = "*/*"
-
-  settings {
-    metrics_enabled = true
-    logging_level   = "INFO"
-    data_trace_enabled = true
-  }
-}
-
 # Estágio da API
 resource "aws_api_gateway_stage" "concessionaria" {
   deployment_id = aws_api_gateway_deployment.concessionaria.id
