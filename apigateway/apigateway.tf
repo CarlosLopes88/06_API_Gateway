@@ -249,6 +249,51 @@ resource "aws_api_gateway_integration" "cliente_post" {
   }
 }
 
+# Configuração de OPTIONS para cliente (CORS)
+resource "aws_api_gateway_method" "cliente_options" {
+  rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id   = aws_api_gateway_resource.cliente.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "cliente_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.cliente.id
+  http_method = aws_api_gateway_method.cliente_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "cliente_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.cliente.id
+  http_method = aws_api_gateway_method.cliente_options.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "cliente_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.cliente.id
+  http_method = aws_api_gateway_method.cliente_options.http_method
+  status_code = aws_api_gateway_method_response.cliente_options.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}
+
 # Recurso para /cliente/{clienteId}
 resource "aws_api_gateway_resource" "cliente_id" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
@@ -288,11 +333,56 @@ resource "aws_api_gateway_integration" "cliente_get_id" {
   connection_type        = "INTERNET"
 }
 
-# Recursos e métodos para /pedido (substituindo venda)
+# Recursos e métodos para /pedido
 resource "aws_api_gateway_resource" "pedido" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
   parent_id   = aws_api_gateway_rest_api.concessionaria_api.root_resource_id
   path_part   = "pedido"
+}
+
+# Configuração de OPTIONS para pedido (CORS)
+resource "aws_api_gateway_method" "pedido_options" {
+  rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id   = aws_api_gateway_resource.pedido.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "pedido_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.pedido.id
+  http_method = aws_api_gateway_method.pedido_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "pedido_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.pedido.id
+  http_method = aws_api_gateway_method.pedido_options.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "pedido_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.pedido.id
+  http_method = aws_api_gateway_method.pedido_options.http_method
+  status_code = aws_api_gateway_method_response.pedido_options.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
 }
 
 # GET /pedido (listar todos)
@@ -330,6 +420,51 @@ resource "aws_api_gateway_resource" "pedido_ativos" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
   parent_id   = aws_api_gateway_resource.pedido.id
   path_part   = "ativos"
+}
+
+# Configuração de OPTIONS para pedido/ativos (CORS)
+resource "aws_api_gateway_method" "pedido_ativos_options" {
+  rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id   = aws_api_gateway_resource.pedido_ativos.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "pedido_ativos_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.pedido_ativos.id
+  http_method = aws_api_gateway_method.pedido_ativos_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "pedido_ativos_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.pedido_ativos.id
+  http_method = aws_api_gateway_method.pedido_ativos_options.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "pedido_ativos_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.pedido_ativos.id
+  http_method = aws_api_gateway_method.pedido_ativos_options.http_method
+  status_code = aws_api_gateway_method_response.pedido_ativos_options.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
 }
 
 resource "aws_api_gateway_method" "pedido_get_ativos" {
@@ -458,7 +593,8 @@ resource "aws_api_gateway_method" "pedido_post" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.header.Authorization" = true
+    "method.request.header.Authorization" = true,
+    "method.request.header.Content-Type" = true
   }
 }
 
@@ -475,7 +611,8 @@ resource "aws_api_gateway_integration" "pedido_post" {
   connection_type        = "INTERNET"
 
   request_parameters = {
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
+    "integration.request.header.Authorization" = "method.request.header.Authorization",
+    "integration.request.header.Content-Type" = "method.request.header.Content-Type"
   }
 }
 
@@ -534,7 +671,8 @@ resource "aws_api_gateway_method" "pedido_put_status" {
 
   request_parameters = {
     "method.request.path.pedidoId" = true,
-    "method.request.header.Authorization" = true
+    "method.request.header.Authorization" = true,
+    "method.request.header.Content-Type" = true
   }
 }
 
@@ -549,8 +687,63 @@ resource "aws_api_gateway_integration" "pedido_put_status" {
 
   request_parameters = {
     "integration.request.path.pedidoId" = "method.request.path.pedidoId",
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
+    "integration.request.header.Authorization" = "method.request.header.Authorization",
+    "integration.request.header.Content-Type" = "method.request.header.Content-Type"
   }
+  
+  timeout_milliseconds    = 29000
+  connection_type        = "INTERNET"
+}
+
+# Endpoint de teste para pedidos sem autenticação
+resource "aws_api_gateway_resource" "test_pedido" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  parent_id   = aws_api_gateway_rest_api.concessionaria_api.root_resource_id
+  path_part   = "test-pedido"
+}
+
+resource "aws_api_gateway_method" "test_pedido" {
+  rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id   = aws_api_gateway_resource.test_pedido.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "test_pedido" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.test_pedido.id
+  http_method = aws_api_gateway_method.test_pedido.http_method
+  type        = "HTTP_PROXY"
+  
+  integration_http_method = "GET"
+  uri                    = "http://${var.lb_venda_url}/api/pedido"
+  
+  timeout_milliseconds    = 29000
+  connection_type        = "INTERNET"
+}
+
+# Rota de teste para verificação de saúde do serviço de pedidos
+resource "aws_api_gateway_resource" "pedido_health" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  parent_id   = aws_api_gateway_rest_api.concessionaria_api.root_resource_id
+  path_part   = "pedido-health"
+}
+
+resource "aws_api_gateway_method" "pedido_health" {
+  rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id   = aws_api_gateway_resource.pedido_health.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "pedido_health" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.pedido_health.id
+  http_method = aws_api_gateway_method.pedido_health.http_method
+  type        = "HTTP_PROXY"
+  
+  integration_http_method = "GET"
+  uri                    = "http://${var.lb_venda_url}/health"
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
@@ -602,7 +795,8 @@ resource "aws_api_gateway_method" "produto_post" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
   
   request_parameters = {
-    "method.request.header.Authorization" = true
+    "method.request.header.Authorization" = true,
+    "method.request.header.Content-Type" = true
   }
 }
 
@@ -619,7 +813,53 @@ resource "aws_api_gateway_integration" "produto_post" {
   connection_type        = "INTERNET"
   
   request_parameters = {
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
+    "integration.request.header.Authorization" = "method.request.header.Authorization",
+    "integration.request.header.Content-Type" = "method.request.header.Content-Type"
+  }
+}
+
+# Configuração de OPTIONS para produto (CORS)
+resource "aws_api_gateway_method" "produto_options" {
+  rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id   = aws_api_gateway_resource.produto.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "produto_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.produto.id
+  http_method = aws_api_gateway_method.produto_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "produto_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.produto.id
+  http_method = aws_api_gateway_method.produto_options.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "produto_options" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  resource_id = aws_api_gateway_resource.produto.id
+  http_method = aws_api_gateway_method.produto_options.http_method
+  status_code = aws_api_gateway_method_response.produto_options.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -672,7 +912,8 @@ resource "aws_api_gateway_method" "produto_put" {
 
   request_parameters = {
     "method.request.path.produtoId" = true,
-    "method.request.header.Authorization" = true
+    "method.request.header.Authorization" = true,
+    "method.request.header.Content-Type" = true
   }
 }
 
@@ -687,7 +928,8 @@ resource "aws_api_gateway_integration" "produto_put" {
 
   request_parameters = {
     "integration.request.path.produtoId" = "method.request.path.produtoId",
-    "integration.request.header.Authorization" = "method.request.header.Authorization"
+    "integration.request.header.Authorization" = "method.request.header.Authorization",
+    "integration.request.header.Content-Type" = "method.request.header.Content-Type"
   }
   
   timeout_milliseconds    = 29000
@@ -974,51 +1216,6 @@ resource "aws_api_gateway_integration" "test" {
   connection_type        = "INTERNET"
 }
 
-# Configurações de CORS
-resource "aws_api_gateway_method" "options" {
-  rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id   = aws_api_gateway_resource.cliente.id
-  http_method   = "OPTIONS"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "options" {
-  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id = aws_api_gateway_resource.cliente.id
-  http_method = aws_api_gateway_method.options.http_method
-  type        = "MOCK"
-
-  request_templates = {
-    "application/json" = "{\"statusCode\": 200}"
-  }
-}
-
-resource "aws_api_gateway_method_response" "options" {
-  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id = aws_api_gateway_resource.cliente.id
-  http_method = aws_api_gateway_method.options.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = true,
-    "method.response.header.Access-Control-Allow-Methods" = true,
-    "method.response.header.Access-Control-Allow-Origin"  = true
-  }
-}
-
-resource "aws_api_gateway_integration_response" "options" {
-  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id = aws_api_gateway_resource.cliente.id
-  http_method = aws_api_gateway_method.options.http_method
-  status_code = aws_api_gateway_method_response.options.status_code
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
-    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT'",
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-  }
-}
-
 # Deploy da API
 resource "aws_api_gateway_deployment" "concessionaria" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
@@ -1038,6 +1235,8 @@ resource "aws_api_gateway_deployment" "concessionaria" {
     aws_api_gateway_integration.pedido_post,
     aws_api_gateway_integration.pedido_get_id,
     aws_api_gateway_integration.pedido_put_status,
+    aws_api_gateway_integration.test_pedido,
+    aws_api_gateway_integration.pedido_health,
     aws_api_gateway_integration.produto_get_all,
     aws_api_gateway_integration.produto_post,
     aws_api_gateway_integration.produto_get_id,
@@ -1047,11 +1246,28 @@ resource "aws_api_gateway_deployment" "concessionaria" {
     aws_api_gateway_integration.produto_get_modelo,
     aws_api_gateway_integration.produto_get_ano,
     aws_api_gateway_integration.produto_get_placa,
-    aws_api_gateway_integration.produto_get_cor
+    aws_api_gateway_integration.produto_get_cor,
+    aws_api_gateway_integration.cliente_options,
+    aws_api_gateway_integration.produto_options,
+    aws_api_gateway_integration.pedido_options,
+    aws_api_gateway_integration.pedido_ativos_options
   ]
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+# Configurações de log para API Gateway
+resource "aws_api_gateway_method_settings" "all" {
+  rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
+  stage_name  = aws_api_gateway_stage.concessionaria.stage_name
+  method_path = "*/*"
+
+  settings {
+    metrics_enabled = true
+    logging_level   = "INFO"
+    data_trace_enabled = true
   }
 }
 
