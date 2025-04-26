@@ -80,7 +80,8 @@ resource "aws_api_gateway_method" "webhook_simulacao_post" {
 
   request_parameters = {
     "method.request.path.pedidoId" = true,
-    "method.request.path.status" = true
+    "method.request.path.status"   = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -95,7 +96,8 @@ resource "aws_api_gateway_integration" "webhook_simulacao_post" {
 
   request_parameters = {
     "integration.request.path.pedidoId" = "method.request.path.pedidoId",
-    "integration.request.path.status" = "method.request.path.status"
+    "integration.request.path.status"   = "method.request.path.status",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -125,7 +127,8 @@ resource "aws_api_gateway_method" "pagamento_post" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.pedidoId" = true
+    "method.request.path.pedidoId" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -139,7 +142,8 @@ resource "aws_api_gateway_integration" "pagamento_post" {
   uri                    = "http://${var.lb_venda_url}/api/pagamento/{pedidoId}"
 
   request_parameters = {
-    "integration.request.path.pedidoId" = "method.request.path.pedidoId"
+    "integration.request.path.pedidoId" = "method.request.path.pedidoId",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -155,7 +159,8 @@ resource "aws_api_gateway_method" "pagamento_get" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.pedidoId" = true
+    "method.request.path.pedidoId" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -169,7 +174,8 @@ resource "aws_api_gateway_integration" "pagamento_get" {
   uri                    = "http://${var.lb_venda_url}/api/pagamento/{pedidoId}"
 
   request_parameters = {
-    "integration.request.path.pedidoId" = "method.request.path.pedidoId"
+    "integration.request.path.pedidoId" = "method.request.path.pedidoId",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -190,6 +196,10 @@ resource "aws_api_gateway_method" "cliente_get_all" {
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
+  
+  request_parameters = {
+    "method.request.header.Authorization" = true
+  }
 }
 
 resource "aws_api_gateway_integration" "cliente_get_all" {
@@ -203,6 +213,10 @@ resource "aws_api_gateway_integration" "cliente_get_all" {
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
+  
+  request_parameters = {
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
+  }
 }
 
 # POST /cliente (criar)
@@ -212,6 +226,10 @@ resource "aws_api_gateway_method" "cliente_post" {
   http_method   = "POST"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
+  
+  request_parameters = {
+    "method.request.header.Authorization" = true
+  }
 }
 
 resource "aws_api_gateway_integration" "cliente_post" {
@@ -225,6 +243,10 @@ resource "aws_api_gateway_integration" "cliente_post" {
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
+  
+  request_parameters = {
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
+  }
 }
 
 # Recurso para /cliente/{clienteId}
@@ -243,7 +265,8 @@ resource "aws_api_gateway_method" "cliente_get_id" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.clienteId" = true
+    "method.request.path.clienteId" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -257,24 +280,25 @@ resource "aws_api_gateway_integration" "cliente_get_id" {
   uri                    = "http://${var.lb_cliente_url}/api/cliente/{clienteId}"
 
   request_parameters = {
-    "integration.request.path.clienteId" = "method.request.path.clienteId"
+    "integration.request.path.clienteId" = "method.request.path.clienteId",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
 }
 
-# Recursos e métodos para /venda (antigo pedido)
-resource "aws_api_gateway_resource" "venda" {
+# Recursos e métodos para /pedido (substituindo venda)
+resource "aws_api_gateway_resource" "pedido" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
   parent_id   = aws_api_gateway_rest_api.concessionaria_api.root_resource_id
-  path_part   = "venda"
+  path_part   = "pedido"
 }
 
-# GET /venda (listar todos)
-resource "aws_api_gateway_method" "venda_get_all" {
+# GET /pedido (listar todos)
+resource "aws_api_gateway_method" "pedido_get_all" {
   rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id   = aws_api_gateway_resource.venda.id
+  resource_id   = aws_api_gateway_resource.pedido.id
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
@@ -282,13 +306,12 @@ resource "aws_api_gateway_method" "venda_get_all" {
   request_parameters = {
     "method.request.header.Authorization" = true
   }
-
 }
 
-resource "aws_api_gateway_integration" "venda_get_all" {
+resource "aws_api_gateway_integration" "pedido_get_all" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id = aws_api_gateway_resource.venda.id
-  http_method = aws_api_gateway_method.venda_get_all.http_method
+  resource_id = aws_api_gateway_resource.pedido.id
+  http_method = aws_api_gateway_method.pedido_get_all.http_method
   type        = "HTTP_PROXY"
   
   integration_http_method = "GET"
@@ -302,25 +325,29 @@ resource "aws_api_gateway_integration" "venda_get_all" {
   }
 }
 
-# GET /venda/ativos
-resource "aws_api_gateway_resource" "venda_ativos" {
+# GET /pedido/ativos
+resource "aws_api_gateway_resource" "pedido_ativos" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  parent_id   = aws_api_gateway_resource.venda.id
+  parent_id   = aws_api_gateway_resource.pedido.id
   path_part   = "ativos"
 }
 
-resource "aws_api_gateway_method" "venda_get_ativos" {
+resource "aws_api_gateway_method" "pedido_get_ativos" {
   rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id   = aws_api_gateway_resource.venda_ativos.id
+  resource_id   = aws_api_gateway_resource.pedido_ativos.id
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
+  
+  request_parameters = {
+    "method.request.header.Authorization" = true
+  }
 }
 
-resource "aws_api_gateway_integration" "venda_get_ativos" {
+resource "aws_api_gateway_integration" "pedido_get_ativos" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id = aws_api_gateway_resource.venda_ativos.id
-  http_method = aws_api_gateway_method.venda_get_ativos.http_method
+  resource_id = aws_api_gateway_resource.pedido_ativos.id
+  http_method = aws_api_gateway_method.pedido_get_ativos.http_method
   type        = "HTTP_PROXY"
   
   integration_http_method = "GET"
@@ -328,96 +355,104 @@ resource "aws_api_gateway_integration" "venda_get_ativos" {
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
+  
+  request_parameters = {
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
+  }
 }
 
-# GET /venda/status/{status}
-resource "aws_api_gateway_resource" "venda_status" {
+# GET /pedido/status/{status}
+resource "aws_api_gateway_resource" "pedido_status" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  parent_id   = aws_api_gateway_resource.venda.id
+  parent_id   = aws_api_gateway_resource.pedido.id
   path_part   = "status"
 }
 
-resource "aws_api_gateway_resource" "venda_status_value" {
+resource "aws_api_gateway_resource" "pedido_status_value" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  parent_id   = aws_api_gateway_resource.venda_status.id
+  parent_id   = aws_api_gateway_resource.pedido_status.id
   path_part   = "{status}"
 }
 
-resource "aws_api_gateway_method" "venda_get_status" {
+resource "aws_api_gateway_method" "pedido_get_status" {
   rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id   = aws_api_gateway_resource.venda_status_value.id
+  resource_id   = aws_api_gateway_resource.pedido_status_value.id
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.status" = true
+    "method.request.path.status" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
-resource "aws_api_gateway_integration" "venda_get_status" {
+resource "aws_api_gateway_integration" "pedido_get_status" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id = aws_api_gateway_resource.venda_status_value.id
-  http_method = aws_api_gateway_method.venda_get_status.http_method
+  resource_id = aws_api_gateway_resource.pedido_status_value.id
+  http_method = aws_api_gateway_method.pedido_get_status.http_method
   type        = "HTTP_PROXY"
   
   integration_http_method = "GET"
   uri                    = "http://${var.lb_venda_url}/api/pedido/status/{status}"
 
   request_parameters = {
-    "integration.request.path.status" = "method.request.path.status"
+    "integration.request.path.status" = "method.request.path.status",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
 }
 
-# GET /venda/cliente/{clienteId}
-resource "aws_api_gateway_resource" "venda_cliente" {
+# GET /pedido/cliente/{clienteId}
+resource "aws_api_gateway_resource" "pedido_cliente" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  parent_id   = aws_api_gateway_resource.venda.id
+  parent_id   = aws_api_gateway_resource.pedido.id
   path_part   = "cliente"
 }
 
-resource "aws_api_gateway_resource" "venda_cliente_id" {
+resource "aws_api_gateway_resource" "pedido_cliente_id" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  parent_id   = aws_api_gateway_resource.venda_cliente.id
+  parent_id   = aws_api_gateway_resource.pedido_cliente.id
   path_part   = "{clienteId}"
 }
 
-resource "aws_api_gateway_method" "venda_get_cliente" {
+resource "aws_api_gateway_method" "pedido_get_cliente" {
   rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id   = aws_api_gateway_resource.venda_cliente_id.id
+  resource_id   = aws_api_gateway_resource.pedido_cliente_id.id
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.clienteId" = true
+    "method.request.path.clienteId" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
-resource "aws_api_gateway_integration" "venda_get_cliente" {
+resource "aws_api_gateway_integration" "pedido_get_cliente" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id = aws_api_gateway_resource.venda_cliente_id.id
-  http_method = aws_api_gateway_method.venda_get_cliente.http_method
+  resource_id = aws_api_gateway_resource.pedido_cliente_id.id
+  http_method = aws_api_gateway_method.pedido_get_cliente.http_method
   type        = "HTTP_PROXY"
   
   integration_http_method = "GET"
   uri                    = "http://${var.lb_venda_url}/api/pedido/cliente/{clienteId}"
 
   request_parameters = {
-    "integration.request.path.clienteId" = "method.request.path.clienteId"
+    "integration.request.path.clienteId" = "method.request.path.clienteId",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
 }
 
-# POST /venda (criar)
-resource "aws_api_gateway_method" "venda_post" {
+# POST /pedido (criar)
+resource "aws_api_gateway_method" "pedido_post" {
   rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id   = aws_api_gateway_resource.venda.id
+  resource_id   = aws_api_gateway_resource.pedido.id
   http_method   = "POST"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
@@ -425,13 +460,12 @@ resource "aws_api_gateway_method" "venda_post" {
   request_parameters = {
     "method.request.header.Authorization" = true
   }
-
 }
 
-resource "aws_api_gateway_integration" "venda_post" {
+resource "aws_api_gateway_integration" "pedido_post" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id = aws_api_gateway_resource.venda.id
-  http_method = aws_api_gateway_method.venda_post.http_method
+  resource_id = aws_api_gateway_resource.pedido.id
+  http_method = aws_api_gateway_method.pedido_post.http_method
   type        = "HTTP_PROXY"
   
   integration_http_method = "POST"
@@ -443,77 +477,79 @@ resource "aws_api_gateway_integration" "venda_post" {
   request_parameters = {
     "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
-
 }
 
-# Recurso para /venda/{vendaId}
-resource "aws_api_gateway_resource" "venda_id" {
+# Recurso para /pedido/{pedidoId}
+resource "aws_api_gateway_resource" "pedido_id" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  parent_id   = aws_api_gateway_resource.venda.id
-  path_part   = "{vendaId}"
+  parent_id   = aws_api_gateway_resource.pedido.id
+  path_part   = "{pedidoId}"
 }
 
-# GET /venda/{vendaId}
-resource "aws_api_gateway_method" "venda_get_id" {
+# GET /pedido/{pedidoId}
+resource "aws_api_gateway_method" "pedido_get_id" {
   rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id   = aws_api_gateway_resource.venda_id.id
+  resource_id   = aws_api_gateway_resource.pedido_id.id
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.vendaId" = true
+    "method.request.path.pedidoId" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
-resource "aws_api_gateway_integration" "venda_get_id" {
+resource "aws_api_gateway_integration" "pedido_get_id" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id = aws_api_gateway_resource.venda_id.id
-  http_method = aws_api_gateway_method.venda_get_id.http_method
+  resource_id = aws_api_gateway_resource.pedido_id.id
+  http_method = aws_api_gateway_method.pedido_get_id.http_method
   type        = "HTTP_PROXY"
   
   integration_http_method = "GET"
-  uri                    = "http://${var.lb_venda_url}/api/pedido/{vendaId}"
+  uri                    = "http://${var.lb_venda_url}/api/pedido/{pedidoId}"
 
   request_parameters = {
-    "integration.request.path.vendaId" = "method.request.path.vendaId"
+    "integration.request.path.pedidoId" = "method.request.path.pedidoId",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
 }
 
-# PUT /venda/{vendaId}/status
-resource "aws_api_gateway_resource" "venda_id_status" {
+# PUT /pedido/{pedidoId}/status
+resource "aws_api_gateway_resource" "pedido_id_status" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  parent_id   = aws_api_gateway_resource.venda_id.id
+  parent_id   = aws_api_gateway_resource.pedido_id.id
   path_part   = "status"
 }
 
-resource "aws_api_gateway_method" "venda_put_status" {
+resource "aws_api_gateway_method" "pedido_put_status" {
   rest_api_id   = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id   = aws_api_gateway_resource.venda_id_status.id
+  resource_id   = aws_api_gateway_resource.pedido_id_status.id
   http_method   = "PUT"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.vendaId" = true
+    "method.request.path.pedidoId" = true,
+    "method.request.header.Authorization" = true
   }
-  
 }
 
-resource "aws_api_gateway_integration" "venda_put_status" {
+resource "aws_api_gateway_integration" "pedido_put_status" {
   rest_api_id = aws_api_gateway_rest_api.concessionaria_api.id
-  resource_id = aws_api_gateway_resource.venda_id_status.id
-  http_method = aws_api_gateway_method.venda_put_status.http_method
+  resource_id = aws_api_gateway_resource.pedido_id_status.id
+  http_method = aws_api_gateway_method.pedido_put_status.http_method
   type        = "HTTP_PROXY"
   
   integration_http_method = "PUT"
-  uri                    = "http://${var.lb_venda_url}/api/pedido/{vendaId}/status"
+  uri                    = "http://${var.lb_venda_url}/api/pedido/{pedidoId}/status"
 
   request_parameters = {
-    "integration.request.path.vendaId" = "method.request.path.vendaId"
+    "integration.request.path.pedidoId" = "method.request.path.pedidoId",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -534,6 +570,10 @@ resource "aws_api_gateway_method" "produto_get_all" {
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
+  
+  request_parameters = {
+    "method.request.header.Authorization" = true
+  }
 }
 
 resource "aws_api_gateway_integration" "produto_get_all" {
@@ -547,6 +587,10 @@ resource "aws_api_gateway_integration" "produto_get_all" {
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
+  
+  request_parameters = {
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
+  }
 }
 
 # POST /produto (criar)
@@ -556,6 +600,10 @@ resource "aws_api_gateway_method" "produto_post" {
   http_method   = "POST"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
+  
+  request_parameters = {
+    "method.request.header.Authorization" = true
+  }
 }
 
 resource "aws_api_gateway_integration" "produto_post" {
@@ -569,6 +617,10 @@ resource "aws_api_gateway_integration" "produto_post" {
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
+  
+  request_parameters = {
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
+  }
 }
 
 # Recurso para /produto/{produtoId}
@@ -587,7 +639,8 @@ resource "aws_api_gateway_method" "produto_get_id" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.produtoId" = true
+    "method.request.path.produtoId" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -601,7 +654,8 @@ resource "aws_api_gateway_integration" "produto_get_id" {
   uri                    = "http://${var.lb_produto_url}/api/produto/{produtoId}"
 
   request_parameters = {
-    "integration.request.path.produtoId" = "method.request.path.produtoId"
+    "integration.request.path.produtoId" = "method.request.path.produtoId",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -617,7 +671,8 @@ resource "aws_api_gateway_method" "produto_put" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.produtoId" = true
+    "method.request.path.produtoId" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -631,7 +686,8 @@ resource "aws_api_gateway_integration" "produto_put" {
   uri                    = "http://${var.lb_produto_url}/api/produto/{produtoId}"
 
   request_parameters = {
-    "integration.request.path.produtoId" = "method.request.path.produtoId"
+    "integration.request.path.produtoId" = "method.request.path.produtoId",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -647,7 +703,8 @@ resource "aws_api_gateway_method" "produto_delete" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.produtoId" = true
+    "method.request.path.produtoId" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -661,7 +718,8 @@ resource "aws_api_gateway_integration" "produto_delete" {
   uri                    = "http://${var.lb_produto_url}/api/produto/{produtoId}"
 
   request_parameters = {
-    "integration.request.path.produtoId" = "method.request.path.produtoId"
+    "integration.request.path.produtoId" = "method.request.path.produtoId",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -690,7 +748,8 @@ resource "aws_api_gateway_method" "produto_get_marca" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.marca" = true
+    "method.request.path.marca" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -704,7 +763,8 @@ resource "aws_api_gateway_integration" "produto_get_marca" {
   uri                    = "http://${var.lb_produto_url}/api/produto/marca/{marca}"
 
   request_parameters = {
-    "integration.request.path.marca" = "method.request.path.marca"
+    "integration.request.path.marca" = "method.request.path.marca",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -732,7 +792,8 @@ resource "aws_api_gateway_method" "produto_get_modelo" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.modelo" = true
+    "method.request.path.modelo" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -746,7 +807,8 @@ resource "aws_api_gateway_integration" "produto_get_modelo" {
   uri                    = "http://${var.lb_produto_url}/api/produto/modelo/{modelo}"
 
   request_parameters = {
-    "integration.request.path.modelo" = "method.request.path.modelo"
+    "integration.request.path.modelo" = "method.request.path.modelo",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -774,7 +836,8 @@ resource "aws_api_gateway_method" "produto_get_ano" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.ano" = true
+    "method.request.path.ano" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -788,7 +851,8 @@ resource "aws_api_gateway_integration" "produto_get_ano" {
   uri                    = "http://${var.lb_produto_url}/api/produto/ano/{ano}"
 
   request_parameters = {
-    "integration.request.path.ano" = "method.request.path.ano"
+    "integration.request.path.ano" = "method.request.path.ano",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -816,7 +880,8 @@ resource "aws_api_gateway_method" "produto_get_placa" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.placa" = true
+    "method.request.path.placa" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -830,7 +895,8 @@ resource "aws_api_gateway_integration" "produto_get_placa" {
   uri                    = "http://${var.lb_produto_url}/api/produto/placa/{placa}"
 
   request_parameters = {
-    "integration.request.path.placa" = "method.request.path.placa"
+    "integration.request.path.placa" = "method.request.path.placa",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -858,7 +924,8 @@ resource "aws_api_gateway_method" "produto_get_cor" {
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
   request_parameters = {
-    "method.request.path.cor" = true
+    "method.request.path.cor" = true,
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -872,7 +939,8 @@ resource "aws_api_gateway_integration" "produto_get_cor" {
   uri                    = "http://${var.lb_produto_url}/api/produto/cor/{cor}"
 
   request_parameters = {
-    "integration.request.path.cor" = "method.request.path.cor"
+    "integration.request.path.cor" = "method.request.path.cor",
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
   
   timeout_milliseconds    = 29000
@@ -963,13 +1031,13 @@ resource "aws_api_gateway_deployment" "concessionaria" {
     aws_api_gateway_integration.cliente_get_all,
     aws_api_gateway_integration.cliente_post,
     aws_api_gateway_integration.cliente_get_id,
-    aws_api_gateway_integration.venda_get_all,
-    aws_api_gateway_integration.venda_get_ativos,
-    aws_api_gateway_integration.venda_get_status,
-    aws_api_gateway_integration.venda_get_cliente,
-    aws_api_gateway_integration.venda_post,
-    aws_api_gateway_integration.venda_get_id,
-    aws_api_gateway_integration.venda_put_status,
+    aws_api_gateway_integration.pedido_get_all,
+    aws_api_gateway_integration.pedido_get_ativos,
+    aws_api_gateway_integration.pedido_get_status,
+    aws_api_gateway_integration.pedido_get_cliente,
+    aws_api_gateway_integration.pedido_post,
+    aws_api_gateway_integration.pedido_get_id,
+    aws_api_gateway_integration.pedido_put_status,
     aws_api_gateway_integration.produto_get_all,
     aws_api_gateway_integration.produto_post,
     aws_api_gateway_integration.produto_get_id,
