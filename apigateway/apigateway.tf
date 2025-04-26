@@ -287,7 +287,7 @@ resource "aws_api_gateway_integration" "venda_get_all" {
   type        = "HTTP_PROXY"
   
   integration_http_method = "GET"
-  uri                    = "http://${var.lb_venda_url}/api/venda"
+  uri                    = "http://${var.lb_venda_url}/api/pedido"
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
@@ -421,7 +421,7 @@ resource "aws_api_gateway_integration" "venda_post" {
   type        = "HTTP_PROXY"
   
   integration_http_method = "POST"
-  uri                    = "http://${var.lb_venda_url}/api/venda"
+  uri                    = "http://${var.lb_venda_url}/api/pedido"
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
