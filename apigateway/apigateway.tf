@@ -315,7 +315,7 @@ resource "aws_api_gateway_integration" "venda_get_ativos" {
   type        = "HTTP_PROXY"
   
   integration_http_method = "GET"
-  uri                    = "http://${var.lb_venda_url}/api/venda/ativos"
+  uri                    = "http://${var.lb_venda_url}/api/pedido/ativos"
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
@@ -353,7 +353,7 @@ resource "aws_api_gateway_integration" "venda_get_status" {
   type        = "HTTP_PROXY"
   
   integration_http_method = "GET"
-  uri                    = "http://${var.lb_venda_url}/api/venda/status/{status}"
+  uri                    = "http://${var.lb_venda_url}/api/pedido/status/{status}"
 
   request_parameters = {
     "integration.request.path.status" = "method.request.path.status"
@@ -395,7 +395,7 @@ resource "aws_api_gateway_integration" "venda_get_cliente" {
   type        = "HTTP_PROXY"
   
   integration_http_method = "GET"
-  uri                    = "http://${var.lb_venda_url}/api/venda/cliente/{clienteId}"
+  uri                    = "http://${var.lb_venda_url}/api/pedido/cliente/{clienteId}"
 
   request_parameters = {
     "integration.request.path.clienteId" = "method.request.path.clienteId"
@@ -454,7 +454,7 @@ resource "aws_api_gateway_integration" "venda_get_id" {
   type        = "HTTP_PROXY"
   
   integration_http_method = "GET"
-  uri                    = "http://${var.lb_venda_url}/api/venda/{vendaId}"
+  uri                    = "http://${var.lb_venda_url}/api/pedido/{vendaId}"
 
   request_parameters = {
     "integration.request.path.vendaId" = "method.request.path.vendaId"
@@ -490,7 +490,7 @@ resource "aws_api_gateway_integration" "venda_put_status" {
   type        = "HTTP_PROXY"
   
   integration_http_method = "PUT"
-  uri                    = "http://${var.lb_venda_url}/api/venda/{vendaId}/status"
+  uri                    = "http://${var.lb_venda_url}/api/pedido/{vendaId}/status"
 
   request_parameters = {
     "integration.request.path.vendaId" = "method.request.path.vendaId"
