@@ -278,6 +278,11 @@ resource "aws_api_gateway_method" "venda_get_all" {
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
+  
+  request_parameters = {
+    "method.request.header.Authorization" = true
+  }
+
 }
 
 resource "aws_api_gateway_integration" "venda_get_all" {
@@ -291,6 +296,10 @@ resource "aws_api_gateway_integration" "venda_get_all" {
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
+
+  request_parameters = {
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
+  }
 }
 
 # GET /venda/ativos
@@ -306,6 +315,11 @@ resource "aws_api_gateway_method" "venda_get_ativos" {
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
+
+  request_parameters = {
+    "method.request.path.status" = true
+  }
+
 }
 
 resource "aws_api_gateway_integration" "venda_get_ativos" {
@@ -319,6 +333,11 @@ resource "aws_api_gateway_integration" "venda_get_ativos" {
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
+
+  request_parameters = {
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
+  }
+  
 }
 
 # GET /venda/status/{status}
@@ -412,6 +431,11 @@ resource "aws_api_gateway_method" "venda_post" {
   http_method   = "POST"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
+
+  request_parameters = {
+    "method.request.header.Authorization" = true
+  }
+
 }
 
 resource "aws_api_gateway_integration" "venda_post" {
@@ -425,6 +449,11 @@ resource "aws_api_gateway_integration" "venda_post" {
   
   timeout_milliseconds    = 29000
   connection_type        = "INTERNET"
+
+  request_parameters = {
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
+  }
+
 }
 
 # Recurso para /venda/{vendaId}
@@ -481,6 +510,7 @@ resource "aws_api_gateway_method" "venda_put_status" {
   request_parameters = {
     "method.request.path.vendaId" = true
   }
+  
 }
 
 resource "aws_api_gateway_integration" "venda_put_status" {
