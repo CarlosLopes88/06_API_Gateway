@@ -279,6 +279,8 @@ resource "aws_api_gateway_method_response" "cliente_options" {
     "method.response.header.Access-Control-Allow-Methods" = true,
     "method.response.header.Access-Control-Allow-Origin"  = true
   }
+
+  depends_on = [aws_api_gateway_method.cliente_options]
 }
 
 resource "aws_api_gateway_integration_response" "cliente_options" {
@@ -292,6 +294,11 @@ resource "aws_api_gateway_integration_response" "cliente_options" {
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'",
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
+
+  depends_on = [
+    aws_api_gateway_method_response.cliente_options,
+    aws_api_gateway_integration.cliente_options
+  ]
 }
 
 # Recurso para /cliente/{clienteId}
@@ -370,6 +377,8 @@ resource "aws_api_gateway_method_response" "pedido_options" {
     "method.response.header.Access-Control-Allow-Methods" = true,
     "method.response.header.Access-Control-Allow-Origin"  = true
   }
+
+  depends_on = [aws_api_gateway_method.pedido_options]
 }
 
 resource "aws_api_gateway_integration_response" "pedido_options" {
@@ -383,6 +392,11 @@ resource "aws_api_gateway_integration_response" "pedido_options" {
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'",
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
+
+  depends_on = [
+    aws_api_gateway_method_response.pedido_options,
+    aws_api_gateway_integration.pedido_options
+  ]
 }
 
 # GET /pedido (listar todos)
@@ -452,6 +466,8 @@ resource "aws_api_gateway_method_response" "pedido_ativos_options" {
     "method.response.header.Access-Control-Allow-Methods" = true,
     "method.response.header.Access-Control-Allow-Origin"  = true
   }
+
+  depends_on = [aws_api_gateway_method.pedido_ativos_options]
 }
 
 resource "aws_api_gateway_integration_response" "pedido_ativos_options" {
@@ -465,6 +481,11 @@ resource "aws_api_gateway_integration_response" "pedido_ativos_options" {
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'",
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
+
+  depends_on = [
+    aws_api_gateway_method_response.pedido_ativos_options,
+    aws_api_gateway_integration.pedido_ativos_options
+  ]
 }
 
 resource "aws_api_gateway_method" "pedido_get_ativos" {
@@ -848,6 +869,8 @@ resource "aws_api_gateway_method_response" "produto_options" {
     "method.response.header.Access-Control-Allow-Methods" = true,
     "method.response.header.Access-Control-Allow-Origin"  = true
   }
+
+  depends_on = [aws_api_gateway_method.produto_options]
 }
 
 resource "aws_api_gateway_integration_response" "produto_options" {
@@ -861,6 +884,11 @@ resource "aws_api_gateway_integration_response" "produto_options" {
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'",
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
+
+  depends_on = [
+    aws_api_gateway_method_response.produto_options,
+    aws_api_gateway_integration.produto_options
+  ]
 }
 
 # Recurso para /produto/{produtoId}
@@ -1248,9 +1276,13 @@ resource "aws_api_gateway_deployment" "concessionaria" {
     aws_api_gateway_integration.produto_get_placa,
     aws_api_gateway_integration.produto_get_cor,
     aws_api_gateway_integration.cliente_options,
+    aws_api_gateway_integration_response.cliente_options,
     aws_api_gateway_integration.produto_options,
+    aws_api_gateway_integration_response.produto_options,
     aws_api_gateway_integration.pedido_options,
-    aws_api_gateway_integration.pedido_ativos_options
+    aws_api_gateway_integration_response.pedido_options,
+    aws_api_gateway_integration.pedido_ativos_options,
+    aws_api_gateway_integration_response.pedido_ativos_options
   ]
 
   lifecycle {
